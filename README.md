@@ -1,38 +1,5 @@
 # OpenWrt-Builder
-基于 [ImmortalWrt](https://github.com/immortalwrt/immortalwrt) 定制编译的主路由、旁路网关，跟随 ImmortalWrt 代码更新自动编译。
-
-## 支持的 ImmortalWrt 版本
-* [ ] ImmortalWrt-25.12
-* [x] ImmortalWrt-24.10
-* [x] ImmortalWrt-23.05
-
-# 主路由
-***支持 4/5G 模块拨号上网。***
-
-## 定制内容
-### 精简
-1. 精简全部音频组件。
-
-### 添加
-1. 升级 golang 版本（geodata、xray 等依赖高版本 go）。
-2. 更换 argon 主题。
-3. 添加 ttyd 终端。
-4. 添加 docker 服务。
-5. 添加 upnp 服务。
-6. 添加 kms 服务。
-7. 添加 passwall。
-8. 添加 usb、pci 4/5G 模块拨号、短信、基站锁定等功能。
-9. 添加多功能定时任务。
-10. 添加 iStore 应用市场。
-
-## 安装
-此处不再赘述。
-
-## 配置
-1. 默认账号 `root`，密码 `password`。
-2. 默认 LAN 口 IP 为 `192.168.3.1`。通过 `/etc/config/network` 修改，重启后生效。
-3. 推荐单独部署高级 DNS 服务。可参考 [NestingDNS](https://github.com/217heidai/NestingDNS)，一款尝试 AdGuardHome、MosDNS、SmartDNS 套娃使用最佳实践的 DNS 服务。
-
+基于 [ImmortalWrt](https://github.com/immortalwrt/immortalwrt) 定制编译的主路由、旁路网关，跟随 23.05 分支更新自动编译。
 
 # 旁路网关
 ***仅能虚拟机安装（精简了实体卡驱动）。***
@@ -42,7 +9,7 @@
 本着够用原则，非必要组件全部精简。
 1. 精简 block-mount、automount 磁盘挂载相关组件。
 2. 精简全部实体网卡组件，仅保留 e1000、e1000e、vmxnet3 虚拟网卡组件。
-3. 精简 ppp 拨号组件。旁路网关不负责拨号。
+3. 精简 ppp 拨号组建。旁路网关不负责拨号。
 3. 精简全部音频组件。
 4. 精简全部 usb 组件。
 
@@ -52,6 +19,7 @@
 3. 添加 upnp 服务。
 4. 添加定时重启。
 5. 添加 passwall。
+6. 添加 mosdns
 
 ## 安装
 注意：
@@ -101,7 +69,6 @@ WEB 页面无法直接创建 OpenWrt LXC 容器，此处需要使用 shell 命�
 3. 修改 LXC 容器配置文件 `/etc/pve/lxc/100.conf`（100 为以上创建容器时的容器编号），在文末增加：
     ```bash
     onboot: 1
-    unprivileged: 0
     features: fuse=1,nesting=1
     lxc.include: /usr/share/lxc/config/openwrt.common.conf
     lxc.cgroup2.devices.allow: c 108:0 rwm
@@ -112,10 +79,8 @@ WEB 页面无法直接创建 OpenWrt LXC 容器，此处需要使用 shell 命�
     ```bash
     onboot: 1
         开机自启动。
-    unprivileged: 0
-        开启特权容器，不开特权容器会出现各种奇怪问题，如 dnsmasq 无法启动。
     features: fuse=1,nesting=1
-        启用FUSE，允许嵌套。
+        特权容器，允许嵌套。不开特权容器会出现各种奇怪问题，如 dnsmasq 无法启动。
     lxc.include: /usr/share/lxc/config/openwrt.common.conf
         引用 PVE 自带的 OpenWrt 配置。
     lxc.cgroup2.devices.allow: c 108:0 rwm
@@ -131,7 +96,7 @@ WEB 页面无法直接创建 OpenWrt LXC 容器，此处需要使用 shell 命�
 
 ## 配置
 1. 默认账号 `root`，密码 `password`。
-2. 默认 LAN 口 IP 为 `192.168.1.5`。通过 `/etc/config/network` 修改，重启后生效。
+2. 默认 LAN 口 IP 为 `192.168.123.254`。通过 `/etc/config/network` 修改，重启后生效。
 3. LAN 口网关修改为主路由 IP 地址。
 4. LAN 口 DNS 修改为主路由 IP 地址。推荐单独部署高级 DNS 服务，将旁路网关的 DNS 指过去即可。可参考 [NestingDNS](https://github.com/217heidai/NestingDNS)，一款尝试 AdGuardHome、MosDNS、SmartDNS 套娃使用最佳实践的 DNS 服务。
 5. 作为旁路网关，需关闭 LAN 口 DHCP，由主路由进行 DHCP。（如开启 DHCP 服务，则变为旁路路由模式）
